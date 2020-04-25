@@ -1,0 +1,14 @@
+127.0.0.1 - - [15/Apr/2020:22:04:51 +0530] "GET / HTTP/1.1" 404 1036
+0:0:0:0:0:0:0:1 - - [15/Apr/2020:22:04:56 +0530] "GET /rl.medicine/ HTTP/1.1" 200 95
+0:0:0:0:0:0:0:1 - - [15/Apr/2020:22:05:10 +0530] "GET /rl.medicine/app HTTP/1.1" 200 1046
+0:0:0:0:0:0:0:1 - - [15/Apr/2020:22:05:11 +0530] "GET /favicon.ico HTTP/1.1" 404 1047
+0:0:0:0:0:0:0:1 - - [15/Apr/2020:22:05:13 +0530] "POST /rl.medicine/login HTTP/1.1" 200 434
+0:0:0:0:0:0:0:1 - - [15/Apr/2020:22:05:16 +0530] "GET /rl.medicine/view_medicine_detail HTTP/1.1" 200 1118
+0:0:0:0:0:0:0:1 - - [15/Apr/2020:22:05:19 +0530] "GET /rl.medicine/all_medicines HTTP/1.1" 200 42238
+0:0:0:0:0:0:0:1 - - [15/Apr/2020:22:05:30 +0530] "GET /rl.medicine/all_medicines_by_chemical_name HTTP/1.1" 200 24260
+0:0:0:0:0:0:0:1 - - [15/Apr/2020:22:05:48 +0530] "GET /rl.medicine/all_medicines HTTP/1.1" 200 42238
+0:0:0:0:0:0:0:1 - - [15/Apr/2020:22:06:09 +0530] "GET /rl.medicine/medicine_by_name HTTP/1.1" 200 2882
+0:0:0:0:0:0:0:1 - - [15/Apr/2020:22:06:14 +0530] "POST /rl.medicine/show_medicine_name_list HTTP/1.1" 200 6873
+0:0:0:0:0:0:0:1 - - [15/Apr/2020:22:10:06 +0530] "POST /rl.medicine/show_medicine_name_list HTTP/1.1" 200 6531
+0:0:0:0:0:0:0:1 - - [15/Apr/2020:22:10:17 +0530] "GET /rl.medicine/all_medicines_by_chemical_name HTTP/1.1" 200 24263
+0:0:0:0:0:0:0:1 - - [15/Apr/2020:22:10:27 +0530] "GET /rl.medicine/all_medicines HTTP/1.1" 200 42242

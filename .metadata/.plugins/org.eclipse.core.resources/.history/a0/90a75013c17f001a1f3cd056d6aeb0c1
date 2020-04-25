@@ -1,0 +1,295 @@
+package rl.medicine.serviceimpl;
+
+import static rl.medicine.utility.AppLogger.appDebug;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import rl.medicine.dao.AppDao;
+import rl.medicine.dto.MedicineDetailDTO;
+import rl.medicine.model.DataIdModel;
+import rl.medicine.service.MedicineService;
+
+@Service
+public class MedicineServiceImpl implements MedicineService{
+
+	private static final String TAG = MedicineServiceImpl.class.getSimpleName();
+	
+	@Autowired
+	private AppDao appDao;
+	
+	@Override
+	public List<DataIdModel> listMedicines() {
+		appDebug(TAG+" listMedicines ");
+		return appDao.getMedicineList();
+	}
+
+	@Override
+	public List<DataIdModel> listBoxes() {
+		appDebug(TAG+" listBoxes ");
+		return appDao.getMedicineBoxes();
+	}
+
+	@Override
+	public HashMap<String, List<MedicineDetailDTO>> getMedicineByName(String selectedMedicineName) {
+		appDebug(TAG+" getMedicineByName ");
+		return appDao.getMedicineByName(selectedMedicineName);
+	}
+
+	@Override
+	public HashMap getMedicineByBox(String selectedBoxName) {
+		appDebug(TAG+" getMedicineByBox ");
+		return appDao.getMedicineByBox(selectedBoxName);
+	}
+
+	@Override
+	public HashMap getBoxMedicineBoxByDate() {
+		appDebug(TAG+" getBoxMedicineBoxByDate");
+		
+		return null;
+	}
+
+	@Override
+	public List getAllMedicines() {
+		appDebug(TAG+" getAllMedicines");
+		String METHOD_TAG = TAG+" getAllMedicines";
+		final List<MedicineDetailDTO> allMedicinesListDatabase = appDao.getAllMedicinesList();
+		if(allMedicinesListDatabase != null && !allMedicinesListDatabase.isEmpty()) {
+			final List<MedicineDetailDTO> allDataMedicineList = new ArrayList<MedicineDetailDTO>(allMedicinesListDatabase.size());
+			final LinkedHashMap<String, MedicineDetailDTO> mapMedicineByName = new LinkedHashMap<>(allMedicinesListDatabase.size());
+			for(int index = 0; index<allMedicinesListDatabase.size(); index++) {
+				
+				final String medicineName = allMedicinesListDatabase.get(index).getMedicineName();
+				MedicineDetailDTO medicineListDTO = new MedicineDetailDTO();
+				
+				if(mapMedicineByName.containsKey(medicineName)) {
+					medicineListDTO = mapMedicineByName.get(medicineName);
+				}
+
+				if(medicineListDTO.getMedicineName() == null || medicineListDTO.getMedicineName().isEmpty()) {
+					medicineListDTO.setMedicineName(medicineName);
+				}
+				
+				if(medicineListDTO.getMedicineChemicalName() == null || medicineListDTO.getMedicineChemicalName().isEmpty()) {
+					medicineListDTO.setMedicineChemicalName(allMedicinesListDatabase.get(index).getMedicineChemicalName());
+				}
+
+				if(medicineListDTO.getMedicineNameId() == 0) {
+					medicineListDTO.setMedicineNameId(allMedicinesListDatabase.get(index).getMedicineNameId());
+				}
+				if(medicineListDTO.getMedicineBox() == null || medicineListDTO.getMedicineBox().isEmpty()) {
+					medicineListDTO.setMedicineBox(allMedicinesListDatabase.get(index).getMedicineBox());
+				}
+				if(medicineListDTO.getMedicineBoxId() == 0) {	
+					medicineListDTO.setMedicineBoxId(allMedicinesListDatabase.get(index).getMedicineBoxId());
+				}
+				
+				int strips = medicineListDTO.getStrip();
+				strips = strips + allMedicinesListDatabase.get(index).getStrip();
+				medicineListDTO.setStrip(strips);
+				
+				int leftQuantity = medicineListDTO.getLeftQuantity();
+				leftQuantity = leftQuantity + allMedicinesListDatabase.get(index).getLeftQuantity();
+				medicineListDTO.setLeftQuantity(leftQuantity);
+				
+				Date expiryDate = medicineListDTO.getMedicineExpiryDate();
+				final Date expiryDateDatabase = allMedicinesListDatabase.get(index).getMedicineExpiryDate();
+				Date maxExpiryDate = medicineListDTO.getMaxExpiryDate();
+				
+				if(expiryDate == null) {
+					medicineListDTO.setMedicineExpiryDate(expiryDateDatabase);
+				}else { 
+					 if(expiryDate.getTime() != expiryDateDatabase.getTime()) {
+						 if(expiryDate.getTime() < expiryDateDatabase.getTime()) {
+							 medicineListDTO.setMedicineExpiryDate(expiryDate);
+						 }else {
+							 medicineListDTO.setMedicineExpiryDate(expiryDateDatabase);
+						 }
+					 }
+				}
+				
+				if(maxExpiryDate == null) {
+					medicineListDTO.setMaxExpiryDate(expiryDateDatabase);
+				}else { 
+					 if(maxExpiryDate.getTime() != expiryDateDatabase.getTime()) {
+						 if(maxExpiryDate.getTime() > expiryDateDatabase.getTime()) {
+							 medicineListDTO.setMaxExpiryDate(maxExpiryDate);
+						 }else {
+							 medicineListDTO.setMaxExpiryDate(expiryDateDatabase);
+						 }
+					 }
+				}
+				
+				mapMedicineByName.put(medicineName, medicineListDTO);
+				
+			}
+			synchronized (allDataMedicineList) {
+
+				mapMedicineByName.forEach((medicineName, medicineData)->{
+					MedicineDetailDTO medicineDetailName = new MedicineDetailDTO();
+					medicineDetailName.setMedicineName(medicineName);
+					medicineDetailName.setMedicineDetailDTO(medicineData);
+					allDataMedicineList.add(medicineDetailName);
+				});
+				appDebug(METHOD_TAG+" allDataMedicine Size : "+allDataMedicineList);
+				return allDataMedicineList;
+			}
+		}else {
+			appDebug(METHOD_TAG+" no data of medicine from database.");
+		}
+
+		return null;
+	}
+	
+	@Override
+	public List getAllMedicinesByChemicalName() {
+		appDebug(TAG+" getAllMedicinesByChemicalName");
+		String METHOD_TAG = TAG+" getAllMedicinesByChemicalName";
+		final List<MedicineDetailDTO> allMedicinesListDatabase = appDao.getAllMedicinesList();
+		if(allMedicinesListDatabase != null && !allMedicinesListDatabase.isEmpty()) {
+			final List<MedicineDetailDTO> allDataMedicineList = new ArrayList<MedicineDetailDTO>(allMedicinesListDatabase.size());
+			final LinkedHashMap<String, MedicineDetailDTO> mapMedicineByName = new LinkedHashMap<>(allMedicinesListDatabase.size());
+			for(int index = 0; index<allMedicinesListDatabase.size(); index++) {
+				
+				final String medicineChemicalName = allMedicinesListDatabase.get(index).getMedicineChemicalName();
+				
+				final String medicineName = allMedicinesListDatabase.get(index).getMedicineName();
+				appDebug(METHOD_TAG+" medicine Name : "+medicineName+", Medicine Chemical Name : "+medicineChemicalName);
+				MedicineDetailDTO medicineListDTO = new MedicineDetailDTO();
+				
+				if(mapMedicineByName.containsKey(medicineChemicalName)) {
+					medicineListDTO = mapMedicineByName.get(medicineChemicalName);
+				}
+				
+				if(medicineListDTO.getMedicineChemicalName() == null || medicineListDTO.getMedicineChemicalName().isEmpty()) {
+					medicineListDTO.setMedicineChemicalName(medicineChemicalName);
+				}
+
+				
+				Set<String> medicineNames = medicineListDTO.getMedicineNames();
+				if(medicineNames == null) {
+					medicineNames = new TreeSet<String>();
+				}
+				medicineNames.add(medicineName.toString().trim());
+				
+				medicineListDTO.setMedicineNames(medicineNames);
+				
+				/*if(medicineListDTO.getMedicineName() == null || medicineListDTO.getMedicineName().isEmpty()) {
+					medicineListDTO.setMedicineName(medicineName);
+				}else {
+					medicineListDTO.setMedicineName(medicineListDTO.getMedicineName()+", "+medicineName);
+				}*/
+				
+
+				if(medicineListDTO.getMedicineNameId() == 0) {
+					medicineListDTO.setMedicineNameId(allMedicinesListDatabase.get(index).getMedicineNameId());
+				}
+				if(medicineListDTO.getMedicineBox() == null || medicineListDTO.getMedicineBox().isEmpty()) {
+					medicineListDTO.setMedicineBox(allMedicinesListDatabase.get(index).getMedicineBox());
+				}
+				if(medicineListDTO.getMedicineBoxId() == 0) {	
+					medicineListDTO.setMedicineBoxId(allMedicinesListDatabase.get(index).getMedicineBoxId());
+				}
+				
+			 
+				int strips = medicineListDTO.getStrip();
+				int stripCurrent = allMedicinesListDatabase.get(index).getStrip();
+				int totalQuantity = 0;
+				
+				if(medicineName.contains("15")) {
+					appDebug(METHOD_TAG+" Medicine Name "+medicineName+" is for 15.");
+					totalQuantity = stripCurrent * 15;
+				}else if(medicineName.contains("12")) {
+					appDebug(METHOD_TAG+" Medicine Name "+medicineName+" is for 12.");
+					totalQuantity = stripCurrent * 12;
+				}else if(medicineName.contains("6")) {
+					appDebug(METHOD_TAG+" Medicine Name "+medicineName+" is for 6.");
+					totalQuantity = stripCurrent * 6;
+				}else {
+					appDebug(METHOD_TAG+" Medicine Name "+medicineName+" is for 10.");
+					totalQuantity = stripCurrent * 10;
+				}
+				medicineListDTO.setTotalQuantity(medicineListDTO.getTotalQuantity()+totalQuantity);
+				
+				strips = strips + allMedicinesListDatabase.get(index).getStrip();
+				medicineListDTO.setStrip(strips);
+				
+				int leftQuantity = medicineListDTO.getLeftQuantity();
+				leftQuantity = leftQuantity + allMedicinesListDatabase.get(index).getLeftQuantity();
+				medicineListDTO.setLeftQuantity(leftQuantity);
+				
+				Date expiryDate = medicineListDTO.getMedicineExpiryDate();
+				final Date expiryDateDatabase = allMedicinesListDatabase.get(index).getMedicineExpiryDate();
+				Date maxExpiryDate = medicineListDTO.getMaxExpiryDate();
+				
+				if(expiryDate == null) {
+					medicineListDTO.setMedicineExpiryDate(expiryDateDatabase);
+				}else { 
+					 if(expiryDate.getTime() != expiryDateDatabase.getTime()) {
+						 if(expiryDate.getTime() < expiryDateDatabase.getTime()) {
+							 medicineListDTO.setMedicineExpiryDate(expiryDate);
+						 }else {
+							 medicineListDTO.setMedicineExpiryDate(expiryDateDatabase);
+						 }
+					 }
+				}
+				
+				if(maxExpiryDate == null) {
+					medicineListDTO.setMaxExpiryDate(expiryDateDatabase);
+				}else { 
+					 if(maxExpiryDate.getTime() != expiryDateDatabase.getTime()) {
+						 if(maxExpiryDate.getTime() > expiryDateDatabase.getTime()) {
+							 medicineListDTO.setMaxExpiryDate(maxExpiryDate);
+						 }else {
+							 medicineListDTO.setMaxExpiryDate(expiryDateDatabase);
+						 }
+					 }
+				}
+				
+				mapMedicineByName.put(medicineChemicalName, medicineListDTO);
+				
+			}
+			synchronized (allDataMedicineList) {
+
+				mapMedicineByName.forEach((medicineChemicalName, medicineData)->{
+					MedicineDetailDTO medicineDetailName = new MedicineDetailDTO();
+					medicineDetailName.setMedicineChemicalName(medicineChemicalName);
+					medicineDetailName.setMedicineDetailDTO(medicineData);
+					allDataMedicineList.add(medicineDetailName);
+				});
+				appDebug(METHOD_TAG+" allDataMedicine Size : "+allDataMedicineList);
+				return allDataMedicineList;
+			}
+		}else {
+			appDebug(METHOD_TAG+" no data of medicine from database.");
+		}
+
+		return null;
+
+	}
+	
+	/**
+	 * Get Medicine By Expiry Date
+	 */
+	public HashMap<String, MedicineDetailDTO> getMedicineByExpiryDate(String selectedMedicineName) {
+		final String METHOD_TAG = TAG+" getMedicineByExpiryDate";
+		appDebug("Inside the "+METHOD_TAG);
+		final List<MedicineDetailDTO> medicineInformationByExpiryDateList = appDao.getMedicineExpiryDateList(selectedMedicineName);
+		if(medicineInformationByExpiryDateList != null && !medicineInformationByExpiryDateList.isEmpty()) {
+			final HashMap<String, MedicineDetailDTO> medicineListByExpiryDate = new HashMap<>();
+			for(int )
+			
+			return medicineListByExpiryDate;
+		}
+		return null;
+	}
+
+}

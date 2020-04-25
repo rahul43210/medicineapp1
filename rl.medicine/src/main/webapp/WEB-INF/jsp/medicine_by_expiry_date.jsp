@@ -1,0 +1,147 @@
+<%@page import="rl.medicine.utility.AppLogger"%>
+<%@page import="rl.medicine.utility.AppUtility"%>
+<%@page import="rl.medicine.dao.AppDao"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
+<%@ page import="rl.medicine.model.DataIdModel"
+import="rl.medicine.dto.MedicineDetailDTO" 
+	import="rl.medicine.utility.AppConstant"
+	import="java.util.List"
+	import="java.util.Set"
+	import="java.util.TreeSet"
+	import="java.util.ArrayList"
+	import="java.util.HashMap"
+	import="java.text.ParseException"
+	import="java.text.SimpleDateFormat"
+	import="java.util.Date"
+%>
+
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Medicine By Name</title>
+</head>
+<style>
+
+.tab {position:absolute;left:150px; }
+
+}
+
+.tab2 {position:absolute;left:600px; }
+
+.tab3 {position:absolute;left:700px; }
+
+}
+
+</style>
+<script type="text/javascript">
+	
+	 
+	
+</script>
+<body>
+<br/>
+<h1><a href="home"> Home </a></h1>
+<br/>
+
+<%
+final String JSP_TAG = "medicine_by_expiry_date JSP ";
+	final List<DataIdModel> medicineList = (List<DataIdModel>) request.getAttribute(AppConstant.ATTRIBUTE_MEDICINE_LIST);
+	//final List<DataIdModel> listBoxList = (List<DataIdModel>) request.getAttribute(AppConstant.ATTRIBUTE_MEDICINE_BOX_LIST);
+	System.out.println(JSP_TAG+">> Medicine List : "+medicineList);
+	//System.out.println(">> List Box List : "+listBoxList);
+	String selectedMedicineName = (String)request.getAttribute(AppConstant.ATTRIBUTE_MEDICINE_SELECTED_NAME);
+	if(selectedMedicineName == null ){
+		selectedMedicineName = "";
+	}
+	
+	final HashMap<Date, MedicineDetailDTO> byDateValueData = (HashMap<Date, MedicineDetailDTO>) request.getAttribute(AppConstant.ATTRIBUTE_MAP_MEDICINE_EXPIRY_LIST);
+	
+	System.out.println(" >> byBoxValueData "+byDateValueData);
+	
+	/* final List<String> medicineBoxNameList = new ArrayList<String>();
+	if(listBoxList != null && !listBoxList.isEmpty()){
+	for(DataIdModel model:listBoxList){
+		medicineBoxNameList.add(model.getData());
+	}
+	}
+	System.out.println("Medicine Box List : "+medicineBoxNameList);
+	 */
+	final List<String> medicineNameList = new ArrayList<String>(medicineList.size());
+	for(DataIdModel model:medicineList){
+		medicineNameList.add(model.getData());
+	}
+	System.out.println(" medicineNameList : "+medicineNameList);
+	%>
+<h2>
+	<form action="show_medicine_name_by_expiry_date", method="post">
+	<br/> Medicine Name : <select name = "medicine_name_list">
+							<% for(int i=0; i<medicineNameList.size(); i++) {%>
+							<option><%=medicineNameList.get(i) %></option>
+							<%} %>
+						</select><br/><br/>
+						<input type="submit" value= "Show Data"/> 
+						
+	</form> 						
+</h2>
+<br/> 
+<h3><font color = "dark_red"><b> <%= selectedMedicineName%></b></font></h2>
+<%
+if(byDateValueData != null && !byDateValueData.isEmpty()){
+	final Set<Date> allDates = byDateValueData.keySet();
+	final List<Date> medicineExpiryDateList = new ArrayList<Date>(new TreeSet(allDates));
+
+	for(int index = 0; index < medicineExpiryDateList.size(); index++){
+	final Date listDate = medicineExpiryDateList.get(index);
+	
+	final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMMMM-yyyy");
+	final String dateToShow = simpleDateFormat.format(listDate);
+	
+	final MedicineDetailDTO medicineData = byDateValueData.get(listDate);
+	
+	final String medicineBoxName = medicineData.getMedicineBox();
+	final int totalStrips = medicineData.getTotalQuantity();
+	final int totalLeftQuantity = medicineData.getLeftQuantity();
+	final int totalQuantity = medicineData.getTotalQuantity();
+	
+	AppLogger.appDebug(JSP_TAG+" totalStrips : "+totalStrips+", totalLeftQuantity "+totalLeftQuantity+", totalQuantity "+totalQuantity);
+	
+	final String minimumExpiryDate = "";
+	final String maximumExpiryDate = "";
+	final String nextTillDate = "";
+	
+	
+ %> 
+ 
+ 
+<br/>
+<h3><font color = "dark_orange"><b> <%= dateToShow%></b></font></h2>	
+<br/>
+	
+		
+		<table name = "medicine_data"  border="1">
+			<tr>
+				<th><font color="#EA8D3F">Medicine Box </font></th>
+				<th><font color="#EA8D3F">Total Strips </font></th>
+				<th><font color="#EA8D3F">Left Quantity </font></th>
+				<th><font color="#EA8D3F">Minimum Expiry Date </font></th>
+				<th><font color="#EA8D3F">Maximum Expiry Date </font></th>
+				<th><font color="#EA8D3F">Total Tablet counts </font></th>
+				<th><font color="#EA8D3F">Next date as dose current from Today </font></th>
+				
+			</tr>
+			<tr>
+			<td><b><font color="blue"><%= medicineBoxName%></font></b></td>
+			<td><b><font color="blue"><%= totalStrips%></font></b></td>
+			<td><b><font color="blue"><%= totalLeftQuantity%></font></b></td>
+			<td><b><font color="blue"><%= minimumExpiryDate%></font></b></td>
+			<td><b><font color="blue"><%= maximumExpiryDate%></font></b></td>
+			<td><b><font color="blue"><%= totalQuantity %></font></b></td>
+			<td><b><font color="blue"><%= nextTillDate%></font></b></td>
+			</tr>
+		</table>
+		<br/>
+		<%}} %>
+</body>
+</html>

@@ -1,0 +1,12 @@
+127.0.0.1 - - [30/Mar/2020:14:13:08 +0530] "GET / HTTP/1.1" 404 1036
+0:0:0:0:0:0:0:1 - - [30/Mar/2020:14:13:11 +0530] "GET /rl.medicine/ HTTP/1.1" 200 95
+0:0:0:0:0:0:0:1 - - [30/Mar/2020:14:27:04 +0530] "GET /rl.medicine/app HTTP/1.1" 200 1046
+0:0:0:0:0:0:0:1 - - [30/Mar/2020:14:27:04 +0530] "GET /favicon.ico HTTP/1.1" 404 1047
+0:0:0:0:0:0:0:1 - - [30/Mar/2020:14:27:07 +0530] "POST /rl.medicine/login HTTP/1.1" 200 434
+0:0:0:0:0:0:0:1 - - [30/Mar/2020:14:27:08 +0530] "GET /rl.medicine/view_medicine_detail HTTP/1.1" 200 1118
+0:0:0:0:0:0:0:1 - - [30/Mar/2020:14:27:11 +0530] "GET /rl.medicine/medicine_by_box HTTP/1.1" 200 1066
+0:0:0:0:0:0:0:1 - - [30/Mar/2020:14:27:14 +0530] "POST /rl.medicine/show_medicine_box_list HTTP/1.1" 200 9212
+0:0:0:0:0:0:0:1 - - [30/Mar/2020:14:27:22 +0530] "GET /rl.medicine/home HTTP/1.1" 200 424
+0:0:0:0:0:0:0:1 - - [30/Mar/2020:14:27:25 +0530] "GET /rl.medicine/view_medicine_detail HTTP/1.1" 200 1118
+0:0:0:0:0:0:0:1 - - [30/Mar/2020:14:27:26 +0530] "GET /rl.medicine/all_medicines_by_chemical_name HTTP/1.1" 200 27180
+0:0:0:0:0:0:0:1 - - [30/Mar/2020:16:23:59 +0530] "GET /rl.medicine/app HTTP/1.1" 200 1046
